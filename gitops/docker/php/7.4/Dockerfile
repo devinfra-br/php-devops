@@ -85,8 +85,10 @@ RUN apk update && apk upgrade \
 		    php-dom --repository http://nl.alpinelinux.org/alpine/edge/testing/ && rm /var/cache/apk/* \
             && docker-php-ext-install mysqli pdo pdo_mysql pdo_pgsql zip sockets exif bcmath pcntl \
             && docker-php-ext-configure gd \
-            --with-freetype=/usr/include/ \
-            --with-jpeg=/usr/include/ \
+            --with-gd \
+            --with-freetype-dir=/usr/include/ \
+            --with-png-dir=/usr/include/ \
+            --with-jpeg-dir=/usr/include/ \
             && docker-php-ext-install -j$(nproc) gd \
             && docker-php-ext-enable gd \
             && pecl install --onlyreqdeps --nobuild redis-${REDIS_VERSION}  \
