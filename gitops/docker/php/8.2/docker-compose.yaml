@@ -1,0 +1,8 @@
+name: devops-php82
+services:
+  php82:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"

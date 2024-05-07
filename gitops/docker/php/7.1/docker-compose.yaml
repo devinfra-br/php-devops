@@ -1,0 +1,9 @@
+name: devops-php71
+services:
+  php71:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+

@@ -1,0 +1,8 @@
+name: devops-php81
+services:
+  php81:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
