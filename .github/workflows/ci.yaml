@@ -50,14 +50,17 @@ jobs:
           - 8.0
           - 8.1
           - 8.2
-          - 8.3       
+          - 8.3 
+    defaults:
+      run:
+        working-directory: ./gitops/docker/php/${{ matrix.phpVersion }}              
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Build images 
         run: |
-          docker build -t docker.io/${{ secrets.DOCKER_USERNAME }}/${{ matrix.phpVersion }}:${{ github.sha }} -f ./gitops/docker/php/${{ matrix.phpVersion }}/Dockerfile .
+          docker build -t docker.io/${{ secrets.DOCKER_USERNAME }}/${{ matrix.phpVersion }}:${{ github.sha }} Dockerfile .
       
       - name: Security scan
         uses: docker://aquasec/trivy:0.19.2
