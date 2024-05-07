@@ -9,7 +9,7 @@ ENV REDIS_VERSION=6.0.2 \
     GRPC_VERSION=1.33.1 \
     COMPOSER_VERSION=2.0.8
 
-    LABEL maintainer="DevInfra Community <"
+LABEL maintainer="DevInfra Community <"
 
 COPY ./gitops/docker/php/8.1/config/entrypoint.sh /entrypoint.sh
 
@@ -84,50 +84,42 @@ RUN apk update && apk upgrade \
             php-opcache \
 		    php-dom --repository http://nl.alpinelinux.org/alpine/edge/testing/ && rm /var/cache/apk/* \
             && docker-php-ext-install mysqli pdo pdo_mysql pdo_pgsql zip sockets exif bcmath pcntl \
-
             && docker-php-ext-configure gd \
             --with-freetype=/usr/include/ \
             --with-jpeg=/usr/include/ \
             && docker-php-ext-install -j$(nproc) gd \
             && docker-php-ext-enable gd \
-            
             && pecl install --onlyreqdeps --nobuild redis-${REDIS_VERSION}  \
             && pecl install igbinary \
             && cd "$(pecl config-get temp_dir)/redis" \
             && phpize \
             && ./configure --enable-redis-igbinary \
             && make && make install  \
-
             && pecl install --onlyreqdeps --nobuild mongodb-${MONGODB_VERSION}  \
             && cd "$(pecl config-get temp_dir)/mongodb" \
             && phpize \
             && ./configure --enable-mongodb \
             && make && make install  \
-
             && pecl install --onlyreqdeps --nobuild memcached-${MEMCACHED_VERSION}  \
             && cd "$(pecl config-get temp_dir)/memcached" \
             && phpize \
             && ./configure --enable-memcached \
             && make && make install  \
-
             && pecl install --onlyreqdeps --nobuild rdkafka-${RDKAFKA_VERSION}  \
             && cd "$(pecl config-get temp_dir)/rdkafka" \
             && phpize \
             && ./configure --enable-rdkafka \
             && make && make install  \
-
             && pecl install --onlyreqdeps --nobuild amqp-${AMQP_VERSION}  \
             && cd "$(pecl config-get temp_dir)/amqp" \
             && phpize \
             && ./configure --enable-amqp \
             && make && make install  \
-
             #&& pecl install --onlyreqdeps --nobuild xdebug-${XDEBUG_VERSION} \
             #&& cd "$(pecl config-get temp_dir)/xdebug" \
             #&& phpize \
             #&& ./configure --enable-xdebug \
             #&& make && make install  \
-
             && docker-php-ext-enable igbinary \
             && docker-php-ext-enable redis \
             && docker-php-ext-enable mongodb \
@@ -136,7 +128,6 @@ RUN apk update && apk upgrade \
             && docker-php-ext-enable amqp \
             #&& docker-php-ext-enable xdebug \
             #&& docker-php-ext-enable grpc \
-            
             && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer \
             && mkdir -p  /run/nginx && touch /run/nginx/nginx.pid \
             && chown -R nginx:nginx /run/nginx/nginx.pid \   

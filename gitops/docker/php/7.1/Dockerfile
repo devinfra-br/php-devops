@@ -1,20 +1,25 @@
 FROM php:7.1.33-fpm-alpine
 
-ENV REDIS_VERSION=5.1.1 \
-    MONGODB_VERSION=1.6.0 \
-    MEMCACHED_VERSION=3.1.5 \
-    RDKAFKA_VERSION=4.1.2 \
-    AMQP_VERSION=1.9.4 \
-    XDEBUG_VERSION=2.9.0 \
+# Set environment variables
+ENV REDIS_VERSION=4.1.1 \
+    MONGODB_VERSION=1.2.9 \
+    MEMCACHED_VERSION=3.1.1 \
+    RDKAFKA_VERSION=3.0.5 \
+    AMQP_VERSION=1.8.0 \
+    XDEBUG_VERSION=2.5.0 \
     GRPC_VERSION=1.33.1 \
     COMPOSER_VERSION=2.0.8
 
+# Set maintainer
 LABEL maintainer="DevInfra Community <"
 
+# Copy entrypoint.sh
 COPY ./gitops/docker/php/7.1/config/entrypoint.sh /entrypoint.sh
 
+# Set working directory
 WORKDIR /var/www/app
 
+# Install dependencies
 RUN apk update && apk upgrade \
             && apk add --no-cache --update --virtual buildDeps autoconf re2c \
             && apk add --no-cache --update --virtual buildDeps $PHPIZE_DEPS \
@@ -89,51 +94,52 @@ RUN apk update && apk upgrade \
             php7-apcu \
             php7-opcache \
 		    php7-dom --repository http://nl.alpinelinux.org/alpine/edge/testing/ && rm /var/cache/apk/* \
+            # Install PHP extensions
             && docker-php-ext-install mysqli pdo pdo_mysql pdo_pgsql\
-
+            # Install additional PHP extensions
             && docker-php-ext-configure gd \
             --with-freetype=/usr/include/ \
             --with-jpeg=/usr/include/ \
             && docker-php-ext-install -j$(nproc) gd \
             && docker-php-ext-enable gd \
-
-            && pecl install --onlyreqdeps --nobuild redis-4.1.1  \
+            # Lib redis install
+            && pecl install --onlyreqdeps --nobuild redis-${REDIS_VERSION}  \
             && pecl install igbinary \
             && cd "$(pecl config-get temp_dir)/redis" \
             && phpize \
             && ./configure --enable-redis-igbinary \
             && make && make install  \
-
-            && pecl install --onlyreqdeps --nobuild mongodb-1.2.9  \
+            # Lib mongodb install
+            && pecl install --onlyreqdeps --nobuild mongodb-${MONGODB_VERSION}  \
             && cd "$(pecl config-get temp_dir)/mongodb" \
             && phpize \
             && ./configure --enable-mongodb \
             && make && make install  \
-
-            && pecl install --onlyreqdeps --nobuild memcached-3.1.1  \
+            # Lib memcached install
+            && pecl install --onlyreqdeps --nobuild memcached-${MEMCACHED_VERSION}  \
             && cd "$(pecl config-get temp_dir)/memcached" \
             && phpize \
             && ./configure --enable-memcached \
             && make && make install  \
-
-            && pecl install --onlyreqdeps --nobuild rdkafka-3.0.5  \
+            # Lib rdkafka install
+            && pecl install --onlyreqdeps --nobuild rdkafka-${RDKAFKA_VERSION}  \
             && cd "$(pecl config-get temp_dir)/rdkafka" \
             && phpize \
             && ./configure --enable-rdkafka \
             && make && make install  \
-
-            && pecl install --onlyreqdeps --nobuild amqp-1.8.0  \
+            # Lib amqp install
+            && pecl install --onlyreqdeps --nobuild amqp-${AMQP_VERSION}  \
             && cd "$(pecl config-get temp_dir)/amqp" \
             && phpize \
             && ./configure --enable-amqp \
             && make && make install  \
-
-            && pecl install --onlyreqdeps --nobuild xdebug-2.5.0 \
+            # Lib xdebug install
+            && pecl install --onlyreqdeps --nobuild xdebug-${XDEBUG_VERSION} \
             && cd "$(pecl config-get temp_dir)/xdebug" \
             && phpize \
             && ./configure --enable-xdebug \
             && make && make install  \
-
+            # Enable extensions
             && docker-php-ext-enable igbinary \
             && docker-php-ext-enable redis \
             && docker-php-ext-enable mongodb \
@@ -142,19 +148,26 @@ RUN apk update && apk upgrade \
             && docker-php-ext-enable amqp \
             && docker-php-ext-enable xdebug \
             #&& docker-php-ext-enable grpc \
-            
+            # Install composer
             && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer \
+            # Create pid file for nginx
             && mkdir -p  /run/nginx && touch /run/nginx/nginx.pid \
             && chown -R nginx:nginx /run/nginx/nginx.pid \   
+            # Set permissions for entrypoint.sh
             && chmod +x /entrypoint.sh \
+            # Clean up
             && apk del buildDeps \ 
+            && rm -rf /var/cache/apk/* \
+            # Create log directory for xdebug
             && echo "xdebug.start_with_request=yes" >> /usr/local/etc/php/conf.d/xdebug.ini \
             && echo "xdebug.mode=debug" >> /usr/local/etc/php/conf.d/xdebug.ini \
             && echo "xdebug.log=/var/log/xdebug/xdebug.log" >> /usr/local/etc/php/conf.d/xdebug.ini \
             && echo "xdebug.discover_client_host=1" >> /usr/local/etc/php/conf.d/xdebug.ini \
             && echo "xdebug.client_port=9000" >> /usr/local/etc/php/conf.d/xdebug.ini
+            # Laravel project create
             #&& composer create-project laravel/laravel /var/www/app/
 
+# Copy config files
 COPY ./gitops/docker/php/7.1/php/php.ini-development /usr/local/etc/php/php.ini
 COPY ./gitops/docker/php/7.1/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf
 COPY ./gitops/docker/php/7.1/nginx/nginx.conf /etc/nginx/nginx.conf
@@ -162,9 +175,9 @@ COPY ./gitops/docker/php/7.1/php/php-fpm.d/ /usr/local/etc/php-fpm.d/
 COPY ./gitops/docker/php/7.1/config/supervisord.conf /etc/supervisord.conf
 #COPY ./config/info.php /var/www/app/public/info.php
 
+# Expose port 80
 EXPOSE 80
 
-ENTRYPOINT ["/entrypoint.sh"]
-## /usr/local/etc
-## /etc/nginx 
+# Start supervisord
+ENTRYPOINT ["/entrypoint.sh"] 
 
