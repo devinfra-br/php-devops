@@ -131,7 +131,7 @@ jobs:
           push: true
           labels: ${{ steps.metasha.outputs.labels }}
           tags: |
-            docker.io/${{ secrets.DOCKER_USERNAME }}/${{ matrix.phpVersion }}-${{ steps.metasha.outputs.tags }}
+            docker.io/${{ secrets.DOCKER_USERNAME }}/php-${{ steps.metasha.outputs.tags }}
 
       - name: Build and push ${{ matrix.phpVersion }} image
         uses: docker/build-push-action@v5
@@ -143,7 +143,7 @@ jobs:
           push: true
           labels: ${{ steps.metalatest.outputs.labels }}
           tags: |
-            docker.io/${{ secrets.DOCKER_USERNAME }}/${{ matrix.phpVersion }}-${{ steps.metalatest.outputs.tags }}
+            docker.io/${{ secrets.DOCKER_USERNAME }}/php-${{ steps.metalatest.outputs.tags }}
 
       - name: Use output version latest
         id: output-version-latest
