@@ -1,4 +1,4 @@
-FROM php:7.2.34-fpm-alpine
+FROM php:7.2-fpm-alpine
 
 # Set environment variables
 ENV REDIS_VERSION=5.1.1 \
@@ -100,8 +100,10 @@ RUN apk update && apk upgrade \
             && docker-php-ext-install mysqli pdo pdo_mysql pdo_pgsql\
             # Install PHP extensions
             && docker-php-ext-configure gd \
-            --with-freetype=/usr/include/ \
-            --with-jpeg=/usr/include/ \
+            --with-gd \
+            --with-freetype-dir=/usr/include/ \
+            --with-png-dir=/usr/include/ \
+            --with-jpeg-dir=/usr/include/ \
             && docker-php-ext-install -j$(nproc) gd \
             && docker-php-ext-enable gd \
             # Lib redis install
@@ -163,7 +165,7 @@ RUN apk update && apk upgrade \
             # Create log directory for xdebug
             && echo "xdebug.start_with_request=yes" >> /usr/local/etc/php/conf.d/xdebug.ini \
             && echo "xdebug.mode=debug" >> /usr/local/etc/php/conf.d/xdebug.ini \
-            && echo "xdebug.log=/var/log/xdebug/xdebug.log" >> /usr/local/etc/php/conf.d/xdebug.ini \
+            && echo "xdebug.log=/var/log/xdebug.log" >> /usr/local/etc/php/conf.d/xdebug.ini \
             && echo "xdebug.discover_client_host=1" >> /usr/local/etc/php/conf.d/xdebug.ini \
             && echo "xdebug.client_port=9000" >> /usr/local/etc/php/conf.d/xdebug.ini
             # Create laravel project
