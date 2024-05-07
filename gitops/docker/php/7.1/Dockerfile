@@ -11,7 +11,7 @@ ENV REDIS_VERSION=5.1.1 \
 
 LABEL maintainer="DevInfra Community <"
 
-COPY ./config/entrypoint.sh /entrypoint.sh
+COPY ./gitops/docker/php/7.1/config/entrypoint.sh /entrypoint.sh
 
 WORKDIR /var/www/app
 
@@ -155,11 +155,11 @@ RUN apk update && apk upgrade \
             && echo "xdebug.client_port=9000" >> /usr/local/etc/php/conf.d/xdebug.ini
             #&& composer create-project laravel/laravel /var/www/app/
 
-COPY ./php/php.ini-development /usr/local/etc/php/php.ini
-COPY ./nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf
-COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
-COPY ./php/php-fpm.d/ /usr/local/etc/php-fpm.d/
-COPY ./config/supervisord.conf /etc/supervisord.conf
+COPY ./gitops/docker/php/7.1/php/php.ini-development /usr/local/etc/php/php.ini
+COPY ./gitops/docker/php/7.1/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf
+COPY ./gitops/docker/php/7.1/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY ./gitops/docker/php/7.1/php/php-fpm.d/ /usr/local/etc/php-fpm.d/
+COPY ./gitops/docker/php/7.1/config/supervisord.conf /etc/supervisord.conf
 #COPY ./config/info.php /var/www/app/public/info.php
 
 EXPOSE 80
