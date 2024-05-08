@@ -1,4 +1,4 @@
-## DEVINFRA DEVOPS PHP-FPM and NGINX Package
+## DEVINFRA PHP DEVOPS (PHP-FPM and NGINX) Package
 [![Build and Push Docker Images](https://github.com/devinfra-br/php-devops/actions/workflows/ci.yaml/badge.svg)](https://github.com/devinfra-br/php-devops/actions/workflows/ci.yaml)
 
 ### Descrição
