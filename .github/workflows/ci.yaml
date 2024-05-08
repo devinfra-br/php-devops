@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    paths:
+      - './gitops/docker/php/'      
 jobs:
   tagging_repo: 
     runs-on: ubuntu-latest

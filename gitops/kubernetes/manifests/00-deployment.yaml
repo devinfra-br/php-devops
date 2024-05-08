@@ -1,0 +1,143 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: MyApp
+  labels:
+    app: MyApp
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate  
+  selector:
+    matchLabels:
+      app: MyApp
+  template:
+    metadata:
+      labels:
+        app: MyApp
+    spec:
+      serviceAccountName: MyApp
+      terminationGracePeriodSeconds: 5
+      securityContext:
+        fsGroup: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+      - name: web
+        image: devinfrabr/php-8.3:latest
+        ports:
+          - name: http
+            containerPort: 80
+        env:
+          - name: DB_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: MyApp
+                key: db_user
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: MyApp
+                key: db_pass
+          - name: REDIS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: MyApp
+                key: redis_pass  
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: MyApp
+                key: aws_secret_key_id  
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: MyApp
+                key: aws_secret_access_key  
+          - name: PUSHER_APP_ID
+            valueFrom:
+              secretKeyRef:
+                name: MyApp
+                key: pusher_app_id  
+          - name: PUSHER_APP_KEY
+            valueFrom:
+              secretKeyRef:
+                name: MyApp
+                key: pusher_app_key  
+          - name: PUSHER_APP_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: MyApp
+                key: pusher_app_secret                 
+          - name: VITE_PUSHER_APP_KEY
+            valueFrom:
+              secretKeyRef:
+                name: MyApp
+                key: vite_pusher_app_key 
+          - name: MAIL_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: MyApp
+                key: mail_username
+          - name: MAIL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: MyApp
+                key: mail_pass
+        volumeMounts:
+        - name: envVars
+          mountPath: "/var/www/app/"
+          readOnly: true                
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 5   
+          failureThreshold: 30
+          periodSeconds: 10  
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 5 
+          failureThreshold: 30
+          periodSeconds: 10 
+        resources:
+          requests:
+            cpu: 100m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+          privileged: false
+          readOnlyRootFilesystem: true
+      #nodeSelector:
+      #  disktype: ssd
+      #affinity:
+      #  nodeAffinity:
+      #    requiredDuringSchedulingIgnoredDuringExecution:
+      #      nodeSelectorTerms:
+      #      - matchExpressions:
+      #        - key: node-type
+      #          operator: In
+      #          values:
+      #          - nginx-node
+      #  podAntiAffinity:
+      #    requiredDuringSchedulingIgnoredDuringExecution:
+      #    - labelSelector:
+      #        matchExpressions:
+      #        - key: app
+      #          operator: In
+      #          values:
+      #          - nginx
+      #      topologyKey: "kubernetes.io/hostname"  
+  volumes:
+  - name: envVars
+    configMap:
+      name: MyApp
