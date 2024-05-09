@@ -1,11 +1,11 @@
-name: Pipeline-Example-Laravel
+name: Pipeline-Laravel
 
 on:
   push:
     branches:
       - main
     paths:
-      - './gitops/build/'      
+      - './gitops/build/Dockerfile'      
 jobs:
   tagging_repo: 
     runs-on: ubuntu-latest
