@@ -1,11 +1,7 @@
 name: Pipeline-Laravel
 
-on:
-  push:
-    branches:
-      - main
-    paths:
-      - './gitops/build/Dockerfile'      
+on: workflow_dispatch
+     
 jobs:
   tagging_repo: 
     runs-on: ubuntu-latest
