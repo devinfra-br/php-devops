@@ -1,0 +1,32 @@
+name: laravel-stack
+services:
+  app: 
+    #image: devinfrabr/laravel-app:latest
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: app
+    ports:
+      - "8080:80"
+    volumes: 
+      - ./app:/var/www/app
+
+  database: 
+    image: mysql:8.0
+    container_name: database
+    environment:
+      MYSQL_DATABASE: laravel
+      MYSQL_USER: lara
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password
+    ports:
+      - "3306:3306"
+    # If persisting data is important, uncomment the following line  
+    volumes:
+      - ./database:/var/lib/mysql   
+
+  redis: 
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - "6379:6379"       

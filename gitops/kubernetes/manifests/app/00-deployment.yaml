@@ -1,31 +1,26 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: MyApp
+  name: php-app
   labels:
-    app: MyApp
+    app: php-app
 spec:
   replicas: 2
   strategy:
     type: RollingUpdate  
   selector:
     matchLabels:
-      app: MyApp
+      app: php-app
   template:
     metadata:
       labels:
-        app: MyApp
+        app: php-app
     spec:
-      serviceAccountName: MyApp
+      serviceAccountName: php-app
       terminationGracePeriodSeconds: 5
-      securityContext:
-        fsGroup: 1000
-        runAsGroup: 1000
-        runAsNonRoot: true
-        runAsUser: 1000
       containers:
       - name: web
-        image: devinfrabr/php-8.3:latest
+        image: devinfrabr/laravel-app:latest
         ports:
           - name: http
             containerPort: 80
@@ -33,62 +28,58 @@ spec:
           - name: DB_USERNAME
             valueFrom:
               secretKeyRef:
-                name: MyApp
+                name: php-app
                 key: db_user
           - name: DB_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: MyApp
+                name: php-app
                 key: db_pass
           - name: REDIS_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: MyApp
+                name: php-app
                 key: redis_pass  
           - name: AWS_ACCESS_KEY_ID
             valueFrom:
               secretKeyRef:
-                name: MyApp
+                name: php-app
                 key: aws_secret_key_id  
           - name: AWS_SECRET_ACCESS_KEY
             valueFrom:
               secretKeyRef:
-                name: MyApp
+                name: php-app
                 key: aws_secret_access_key  
           - name: PUSHER_APP_ID
             valueFrom:
               secretKeyRef:
-                name: MyApp
+                name: php-app
                 key: pusher_app_id  
           - name: PUSHER_APP_KEY
             valueFrom:
               secretKeyRef:
-                name: MyApp
+                name: php-app
                 key: pusher_app_key  
           - name: PUSHER_APP_SECRET
             valueFrom:
               secretKeyRef:
-                name: MyApp
+                name: php-app
                 key: pusher_app_secret                 
           - name: VITE_PUSHER_APP_KEY
             valueFrom:
               secretKeyRef:
-                name: MyApp
+                name: php-app
                 key: vite_pusher_app_key 
           - name: MAIL_USERNAME
             valueFrom:
               secretKeyRef:
-                name: MyApp
+                name: php-app
                 key: mail_username
           - name: MAIL_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: MyApp
-                key: mail_pass
-        volumeMounts:
-        - name: envVars
-          mountPath: "/var/www/app/"
-          readOnly: true                
+                name: php-app
+                key: mail_pass               
         livenessProbe:
           httpGet:
             path: /health
@@ -109,14 +100,11 @@ spec:
             memory: 64Mi
           limits:
             cpu: 200m
-            memory: 128Mi
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-              - ALL
-          privileged: false
-          readOnlyRootFilesystem: true
+            memory: 128Mi      
+        volumeMounts:
+          - name: env-vars
+            mountPath: /var/www/app/.env
+            subPath: .env
       #nodeSelector:
       #  disktype: ssd
       #affinity:
@@ -137,7 +125,7 @@ spec:
       #          values:
       #          - nginx
       #      topologyKey: "kubernetes.io/hostname"  
-  volumes:
-  - name: envVars
-    configMap:
-      name: MyApp
+      volumes:
+      - name: env-vars
+        configMap:
+          name: php-app

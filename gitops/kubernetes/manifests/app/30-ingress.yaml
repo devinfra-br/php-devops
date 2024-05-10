@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: php-app
+  labels:
+    app: php-app
+  annotations: 
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/use-regex: "true"
+spec:
+  rules:
+  - http:
+      paths:
+      - pathType: Prefix
+        path: /app(/|$)(.*)
+        backend:
+          service:
+            name: php-app
+            port:
+              number: 80

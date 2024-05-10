@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: MyApp
+  name: php-app
 data:
   .env: |
 
-    APP_NAME=MyApp
-    APP_ENV=developer
+    APP_NAME=php-app
+    APP_ENV=local
     APP_KEY=base64:2UogamB5F0Tg5aQ309oyp+PPpVkKpqDJaaHjf4UcxMk=
     APP_DEBUG=true
     APP_URL=http://localhost
@@ -14,9 +14,9 @@ data:
     LOG_DEPRECATIONS_CHANNEL=null
     LOG_LEVEL=debug
     DB_CONNECTION=mysql
-    DB_HOST=127.0.0.1
+    DB_HOST=mysql-svc
     DB_PORT=3306
-    DB_DATABASE=laravel
+    DB_DATABASE=db-myapp
     DB_USERNAME=root
     DB_PASSWORD="${DB_PASSWORD}"
     BROADCAST_DRIVER=log
@@ -26,8 +26,8 @@ data:
     SESSION_DRIVER=file
     SESSION_LIFETIME=120
     MEMCACHED_HOST=127.0.0.1
-    REDIS_HOST=127.0.0.1
-    REDIS_PASSWORD="${REDIS_PASSWORD}"
+    REDIS_HOST=redis
+    REDIS_PASSWORD=null #"${REDIS_PASSWORD}"
     REDIS_PORT=6379
     MAIL_MAILER=smtp
     MAIL_HOST=mailpit

@@ -1,4 +1,5 @@
-## DEVINFRA PHP DEVOPS (PHP-FPM and NGINX) Package
+
+## DEVINFRA PHP-FPM and NGINX Package
 [![Build and Push Docker Images](https://github.com/devinfra-br/php-devops/actions/workflows/ci.yaml/badge.svg)](https://github.com/devinfra-br/php-devops/actions/workflows/ci.yaml)
 
 ### Descrição
@@ -47,6 +48,24 @@ As imagens vêm pré-configuradas para fácil integração e implantação. Eles
 
 ### Uso
 
+**Desenvolvimento local com docker** 
+Acesse a pasta `\developer` e execute o arquivo `docker-compose.yaml`
+Nesta pasta contem um arquivo chamado `Dockerfile`, onde será possivel realizar toda a customização da imagem PHP-FPM.
+
+**Desenvolvimento local com kubernetes**
+Acesse a pasta `\gitops\kubernetes\manifests` nestes manifestos você ira encontrar a estrutura de pastas.
+```ssh
+|__gitops
+     |__kubernetes
+	     |__manifests
+	          |__app
+	          |__database
+	          |__redis         
+```
+Crie um novo namespace e realizar o apply dos arquivos diretamente no namespace desejado Ex: `kubectl apply -f ./app -n my-app`
+
+
+### Avisos
 Este repositório é destinado a desenvolvedores familiarizados com o ambiente PHP, especialmente aqueles que trabalham com o framework Laravel. Para começar, siga as instruções fornecidas em cada seção do README correspondente.
 
 ### Contribuição

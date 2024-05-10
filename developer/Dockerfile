@@ -1,0 +1,1 @@
+FROM devinfrabr/php-8.3:latest
