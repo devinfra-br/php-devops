@@ -87,11 +87,13 @@ As imagens vêm pré-configuradas para fácil integração e implantação. Eles
 ### Descrição das pastas
 
 **Desenvolvimento local com docker** 
+
 Acesse a pasta `\developer` e execute o arquivo `docker-compose.yaml`
 Nesta pasta contem um arquivo chamado `Dockerfile`, onde será possivel realizar toda a customização da imagem PHP-FPM.
 
 - **developer**: Nesta pasta você ira encontrar os arquivos para adicionar ao seu projeto para desenvolvimento local, usando docker compose e mapeando os volumes do docker até a pasta da sua aplicação que esta localmente na sua maquina.
-Exemplo:  
+
+**Exemplo**:  
 ```yaml
 name: php-stack
   services:
@@ -107,21 +109,28 @@ name: php-stack
      volumes:
        - ./app:/var/www/app
 ```
+
 - **gitops**: Nesta pasta você ira encontrar diversos arquivos relacionados a automação e configuração do projeto para que você consiga executar seu container em PHP em diversos serviços de container (aws ecs, kubernetes, docker swarm) alem de exemplos de pipelines dos serviços de git mais populares do mercado (github, gitlab, bitbucket).
 
 	> - **helm**: Em breve iremos atualizar o pacote helm para PHP.
 	
 	- **kind**: Nesta pasta você ira encontrar o arquivo **`cluster.yaml`** com ele você poderá criar um cluster kubernetes localmente para simular sua aplicação em PHP sendo executada 100% via kubernetes.
+	- 
 	- **kubernetes**: Nesta pasta você ira encontrar os manifestos para executar sua aplicação em qualquer cluster kuberntes usando ingress para configurar as conexões de entrada e banco de dados mysql e Redis.
+	- 
 	- **pipelines**: Nesta pasta você ira encontrar modelos de pipelines para você criar sua própria versão com as etapas que você precisar para testes, e build e até deploy da sua aplicação.
 
 **Aplicando manifestos kubernetes**
+
 Acesse a pasta `\gitops\kubernetes\manifests` nestes manifestos você ira encontrar a estrutura de pastas.
+
 Você pode criar um namespace reservado apenas para sua aplicação ou versão executando o comando:
+
 ```ssh
 # kubectl apply -f \gitops\kubernetes\manifests\app\* 
 ```
 **kubernetes local**
+
 Caso você não use o minikube você pode instalar o software chamado **kind** usando o link oficial https://kind.sigs.k8s.io/ 
 
 
