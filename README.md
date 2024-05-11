@@ -1,6 +1,7 @@
 
 ## DEVINFRA PHP-FPM and NGINX Package
-[![Build and Push Docker Images](https://github.com/devinfra-br/php-devops/actions/workflows/ci.yaml/badge.svg)](https://github.com/devinfra-br/php-devops/actions/workflows/ci.yaml)
+[![Build and Push Docker Images](https://github.com/devinfra-br/php-devops/actions/workflows/ci.yaml/badge.svg)](https://github.com/devinfra-br/php-devops/actions/workflows/ci.yaml) [![Pipeline-Laravel](https://github.com/devinfra-br/php-devops/actions/workflows/ci-example.yaml/badge.svg)](https://github.com/devinfra-br/php-devops/actions/workflows/ci-example.yaml)
+
 
 ### Descrição
 Essas imagens Docker fornecem uma solução completa para executar aplicativos PHP com PHP-FPM e Nginx. PHP-FPM (FastCGI Process Manager) oferece recursos aprimorados para gerenciar processos PHP, enquanto o Nginx serve como um servidor web de alto desempenho, ideal para lidar com conexões simultâneas de forma eficiente.
@@ -38,31 +39,90 @@ As imagens vêm pré-configuradas para fácil integração e implantação. Eles
 |8.3 | devinfrabr/php-8.3:latest
 
 
-## Funcionalidades
+## Estrutura do repositório
 
-- **Docker Image Build**: Este repositório inclui scripts para construir imagens Docker para várias versões do PHP, desde a 7.1 até a 8.3. Essas imagens são úteis para criar ambientes de desenvolvimento consistentes e isolados.
-
-- **Manifestos Kubernetes Deploy**: Você encontrará manifestos para Kubernetes que facilitam o deploy de suas aplicações PHP em clusters Kubernetes. Esses manifestos garantem uma implantação confiável e escalável de suas aplicações.
-
-- **Exemplo Docker Compose**: Também incluímos um exemplo de arquivo Docker Compose específico para aplicações Laravel. Esse exemplo permite que você configure rapidamente um ambiente de desenvolvimento local para o Laravel usando contêineres Docker.
-
-### Uso
+```py
+# PHP DevOps
+├── developer/
+│   ├── docker-compose.yaml
+│   └── Dockerfile
+│
+├── gitops/
+│   ├── build
+│   │   ├── config
+│   │   └── Dockerfile
+│   │
+│   ├── docker
+|   |   |
+│   │   ├── php
+│   |   |   ├── 7.1 
+│   |   |   ├── 7.2 
+│   |   |   ├── 7.3 
+│   |   |   ├── 7.4 
+│   |   |   ├── 8.0 
+│   |   |   ├── 8.1 
+│   |   |   ├── 8.2
+│   |   |   └── 8.3 
+│   │   └── README.md
+|	|
+│   ├── kubernetes
+│   │   ├── helm
+|   |   |     └── ?????
+│   │   ├── kind
+|   |   |    └── cluster.yaml
+│   │   └── manifests
+│   │	      ├── app
+│   │		  ├── database
+|	|         └── redis
+|   |   
+│   └── pipelines
+│       ├── bitbucket.yml
+│       ├── githubactions.yaml
+│       └── gitlab.yaml
+│
+├── CODE_OF_CONDUCT.md
+├── LICENSE
+└── README.md
+```
+### Descrição das pastas
 
 **Desenvolvimento local com docker** 
 Acesse a pasta `\developer` e execute o arquivo `docker-compose.yaml`
 Nesta pasta contem um arquivo chamado `Dockerfile`, onde será possivel realizar toda a customização da imagem PHP-FPM.
 
-**Desenvolvimento local com kubernetes**
-Acesse a pasta `\gitops\kubernetes\manifests` nestes manifestos você ira encontrar a estrutura de pastas.
-```ssh
-|__gitops
-     |__kubernetes
-	     |__manifests
-	          |__app
-	          |__database
-	          |__redis         
+- **developer**: Nesta pasta você ira encontrar os arquivos para adicionar ao seu projeto para desenvolvimento local, usando docker compose e mapeando os volumes do docker até a pasta da sua aplicação que esta localmente na sua maquina.
+Exemplo:  
+```yaml
+name: php-stack
+  services:
+    app:
+      #image: devinfrabr/php-7.1:latest
+      build:
+	    context: .
+        dockerfile: Dockerfile
+     container_name: app
+     ports:
+       - "8080:80"
+     # Nesta seção você ira adicionar o caminho do código fonte do seu projeto
+     volumes:
+       - ./app:/var/www/app
 ```
-Crie um novo namespace e realizar o apply dos arquivos diretamente no namespace desejado Ex: `kubectl apply -f ./app -n my-app`
+- **gitops**: Nesta pasta você ira encontrar diversos arquivos relacionados a automação e configuração do projeto para que você consiga executar seu container em PHP em diversos serviços de container (aws ecs, kubernetes, docker swarm) alem de exemplos de pipelines dos serviços de git mais populares do mercado (github, gitlab, bitbucket).
+
+	> - **helm**: Em breve iremos atualizar o pacote helm para PHP.
+	
+	- **kind**: Nesta pasta você ira encontrar o arquivo **`cluster.yaml`** com ele você poderá criar um cluster kubernetes localmente para simular sua aplicação em PHP sendo executada 100% via kubernetes.
+	- **kubernetes**: Nesta pasta você ira encontrar os manifestos para executar sua aplicação em qualquer cluster kuberntes usando ingress para configurar as conexões de entrada e banco de dados mysql e Redis.
+	- **pipelines**: Nesta pasta você ira encontrar modelos de pipelines para você criar sua própria versão com as etapas que você precisar para testes, e build e até deploy da sua aplicação.
+
+**Aplicando manifestos kubernetes**
+Acesse a pasta `\gitops\kubernetes\manifests` nestes manifestos você ira encontrar a estrutura de pastas.
+Você pode criar um namespace reservado apenas para sua aplicação ou versão executando o comando:
+```ssh
+# kubectl apply -f \gitops\kubernetes\manifests\app\* 
+```
+**kubernetes local**
+Caso você não use o minikube você pode instalar o software chamado **kind** usando o link oficial https://kind.sigs.k8s.io/ 
 
 
 ### Avisos
