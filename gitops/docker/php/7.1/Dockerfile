@@ -1,4 +1,4 @@
-FROM php:7.1.33-fpm-alpine
+FROM php:7.1-fpm-alpine
 
 # Set environment variables
 ENV REDIS_VERSION=4.1.1 \
